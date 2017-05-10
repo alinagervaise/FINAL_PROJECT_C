@@ -34,7 +34,10 @@ typedef int (*compFun)   (void* e1, void* e2){
 
 /** Display function for list elements */
 typedef void(*prFun)   (void* L){
-
+    List list = *(List*)L;
+    while(!list.head->next){
+        printf
+    }
 }
 
 
