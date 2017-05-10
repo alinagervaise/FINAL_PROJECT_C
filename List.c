@@ -29,7 +29,7 @@
  * than e2, null if they are equal, and positive otherwise.
  */
 typedef int (*compFun)   (void* e1, void* e2){
-
+    return *(int *)e2 - *(int*) e1;
 }
 
 /** Display function for list elements */
