@@ -19,6 +19,7 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "List.h"
 #include "status.h"
 
@@ -35,8 +36,10 @@ typedef int (*compFun)   (void* e1, void* e2){
 /** Display function for list elements */
 typedef void(*prFun)   (void* L){
     List list = *(List*)L;
-    while(!list.head->next){
-        printf
+    Node * temp = list.head;
+    while(!temp->next){
+        printf(*(char*)temp->val);
+        temp = temp->next;
     }
 }
 
