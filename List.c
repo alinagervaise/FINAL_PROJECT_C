@@ -26,17 +26,6 @@
 
 
 
-/** Display function for list elements */
-typedef void(*prFun)   (void* L){
-    List list = *(List*)L;
-    Node * temp = list.head;
-    while(!temp->next){
-        printf(*(char*)temp->val);
-        temp = temp->next;
-    }
-}
-
-
 /** Empty List creation by dynamic memory allocation (O(1)).
  * @param comp comparison function between elements (ala strcmp())
  * @param pr display function for list elements
@@ -85,7 +74,7 @@ status 	nthInList	(List* L, int n, void** e){
     }
     memcpy(e, temp->val, sizeof(L)/L->nelts);
     return OK;
-
+}
 /** Insert element at a given position in the list (O(N)).
  * @param l the list to store the element in
  * @param p the position of the insertion point
@@ -128,14 +117,18 @@ status 	remFromList	(List*L, void*e){
  * @return OK otherwise
 */
 status 	displayList	(List* L){
-
+    List list = *(List*)L;
+    Node * temp = list.head;
+    while(!temp->next){
+        L->pr(temp->val);
+    }
 }
 
 /** sequencially call given function with each element of given list (O(NxF)).
  * @param l the list
  * @param f the function
  */
-void	forEach		(List* L, void(*)(void*)){
+void	forEach		(List* L, void(*)(void*)e){
 
 }
 
@@ -144,7 +137,13 @@ void	forEach		(List* L, void(*)(void*)){
  * @return the number of elements in given list
  */
 int	lengthList	(List* L){
-
+    int n;
+    Node * temp = L->head;
+    while(temp){
+        temp = temp->next;
+        n++;
+    }
+    return  n++;
 }
 
 /** add given element to given list according to compFun function (O(N)).
