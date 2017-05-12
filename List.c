@@ -51,7 +51,16 @@ typedef void(*prFun)   (void* L){
  * @return 0 otherwise
  */
 List*	newList	(compFun comp, prFun pr){
-
+    // create the list
+    List * result = (List*)malloc(sizeof(List));
+    if(!result) {
+        return 0;
+    }
+    result->head = 0;
+    result->nelts = 0;
+    result->comp = comp;
+    result->pr = pr;
+    return result;
 }
 
 /** destroy the list by deallocating used memory (O(N)).
