@@ -20,18 +20,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "List.h"
 #include "status.h"
 
 
-
-/** Comparison function for list elements.
- * Must follow the "strcmp" convention: result is negative if e1 is less
- * than e2, null if they are equal, and positive otherwise.
- */
-typedef int (*compFun)   (void* e1, void* e2){
-    return *(int *)e2 - *(int*) e1;
-}
 
 /** Display function for list elements */
 typedef void(*prFun)   (void* L){
@@ -66,7 +59,12 @@ List*	newList	(compFun comp, prFun pr){
 /** destroy the list by deallocating used memory (O(N)).
  * @param l the list to destroy */
 void 	delList	(List* L){
-
+    while(L->head){
+        Node * temp = L->head;
+        L->head = temp->next;
+        free(temp);
+    }
+    free(L);
 }
 
 /** get the Nth element of the list (O(N)).
@@ -76,9 +74,17 @@ void 	delList	(List* L){
  * @return OK if element found
  * @return ERRINDEX if index out of list bounds
  */
-status 	nthInList	(List* L, int p, void** e){
-
-}
+status 	nthInList	(List* L, int n, void** e){
+    if( n == L->nelts){
+        return ERRINDEX;
+    }
+    int i = 0;
+    Node * temp = L->head;
+    while(temp || i < n){
+       temp = temp->next;
+    }
+    memcpy(e, temp->val, sizeof(L)/L->nelts);
+    return OK;
 
 /** Insert element at a given position in the list (O(N)).
  * @param l the list to store the element in
