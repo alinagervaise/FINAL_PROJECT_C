@@ -72,7 +72,7 @@ status 	nthInList	(List* L, int n, void** e){
     while(temp || i < n){
        temp = temp->next;
     }
-    memcpy(e, temp->val, sizeof(L)/L->nelts);
+    memcpy( temp->val, e, sizeof(L)/L->nelts);
     return OK;
 }
 /** Insert element at a given position in the list (O(N)).
@@ -117,18 +117,18 @@ status 	remFromList	(List*L, void*e){
  * @return OK otherwise
 */
 status 	displayList	(List* L){
-    List list = *(List*)L;
-    Node * temp = list.head;
+    Node * temp = L->head;
     while(!temp->next){
         L->pr(temp->val);
     }
+    return OK;
 }
 
 /** sequencially call given function with each element of given list (O(NxF)).
  * @param l the list
  * @param f the function
  */
-void	forEach		(List* L, void(*)(void*)e){
+void	forEach		(List* L, void(*)(void*)f){
 
 }
 
@@ -154,7 +154,33 @@ int	lengthList	(List* L){
  * @return OK otherwise
  */
 status	addList	(List*L, void*e){
+    Node * newElt = (Node *)malloc(sizeof(Node));
+    if (!newElt){
+        return ERRALLOC;
+    }
+    memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    newElt->next = 0;
+    Node * pr1 = L->head;
+    Node * prev;
+    if (!L->head){
+        L->head->next = newElt;
+    }
+    else {
+        while(pr1){
+            prev = pr1;
+            pr1 = pr1->next;
 
+            if (L->comp(newElt->val, pr1->val) < 0){
+                //insert before temp
+                newElt->next = pr1;
+                prev->next = newElt;
+
+                break;
+            }
+        }
+    }
+    L->nelts ++;;
+    return OK;
 }
 
 /** tests whether the list contains given element (O(N)).
@@ -166,6 +192,28 @@ status	addList	(List*L, void*e){
  */
 Node*	isInList	(List*L, void*e){
 
+    Node * temp = L->head;
+    if (!temp){
+        return 0;
+    }
+    Node * pr1 = L->head;
+    Node * prev;
+    int isHead = 0;
+    while(pr1){
+            prev = pr1;
+            pr1 = pr1->next;
+            isHead ++;
+
+            if (L->comp(e, pr1->val) == 0){
+                if (isHead==1){
+                    return 1;
+                }
+                else{
+                    return prev;
+                }
+            }
+    }
+    return 0;
 }
 
 
