@@ -108,6 +108,7 @@ status 	displayList	(List*);
  */
 void	forEach		(List*,void(*)(void*));
 
+
 /** compute and return the number of elements in given list (O(1)).
  * @param l the list
  * @return the number of elements in given list

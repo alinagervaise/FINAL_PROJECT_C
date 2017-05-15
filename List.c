@@ -84,7 +84,30 @@ status 	nthInList	(List* L, int n, void** e){
  * @return OK otherwise
  */
 status 	addListAt	(List*L, int p, void* e){
-
+    // Create the new node
+    Node * newElt = (Node *)malloc(sizeof(Node));
+    if (!newElt){
+        return ERRALLOC;
+    }
+    memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    newElt->next = 0;
+    //insert the new node
+    Node * temp = L->head;
+    Node *prev;
+    int count = 0;
+    while(temp){
+        prev = temp;
+        temp = temp->next;
+        count ++;
+        if (count > L->nelts){
+            return  ERRINDEX;
+        }
+        if (count == p){
+            newElt->next = temp;
+            prev->next = newElt;
+        }
+    }
+    return OK;
 }
 
 /** remove the element located at a given position in list (O(N)).
@@ -173,8 +196,14 @@ status 	displayList	(List* L){
  * @param l the list
  * @param f the function
  */
-void	forEach		(List* L, void(*)(void*)f){
-
+void	forEach		(List* L, void(*f)(void*)){
+    if (!f){
+        return;
+    }
+    Node * temp = L->head;
+    while(temp){
+        f(temp->val);
+    }
 }
 
 /** compute and return the number of elements in given list (O(1)).
@@ -182,13 +211,13 @@ void	forEach		(List* L, void(*)(void*)f){
  * @return the number of elements in given list
  */
 int	lengthList	(List* L){
-    int n;
+    int size;
     Node * temp = L->head;
     while(temp){
         temp = temp->next;
-        n++;
+        size++;
     }
-    return  n++;
+    return  size;
 }
 
 /** add given element to given list according to compFun function (O(N)).
@@ -252,7 +281,7 @@ Node*	isInList	(List*L, void*e){
 
             if (L->comp(e, pr1->val) == 0){
                 if (isHead==1){
-                    return 1;
+                    return pr1;
                 }
                 else{
                     return prev;
