@@ -95,6 +95,30 @@ status 	addListAt	(List*L, int p, void* e){
  * @return OK otherwise
  */
 status 	remFromListAt	(List* L, int p,void** e){
+    if (!L->comp){
+        return ERRUNABLE;
+    }
+    Node * temp = L->head;
+    Node *prev;
+    int count = 0;
+    int isFound = 0;
+    while(temp){
+        prev = temp;
+        temp = temp->next;
+        count ++;
+        if (count > L->nelts){
+            return  ERRINDEX;
+        }
+        if ((count == p) || (L->comp(temp->val, e)==0)){
+            isFound =1;
+            prev->next = temp->next;
+            free(temp);
+        }
+    }
+    if (!isFound){
+        return ERRABSENT;
+    }
+    return OK;
 
 }
 
@@ -107,7 +131,25 @@ status 	remFromListAt	(List* L, int p,void** e){
  * @return OK otherwise
  */
 status 	remFromList	(List*L, void*e){
-
+    if (!L->comp){
+        return ERRUNABLE;
+    }
+    Node * temp = L->head;
+    Node *prev;
+    int isFound = 0;
+    while(temp){
+        prev = temp;
+        temp = temp->next;
+        if (L->comp(temp->val, e)==0){
+            isFound = 1;
+            prev->next = temp->next;
+            free(temp);
+        }
+    }
+    if (!isFound){
+        return ERRABSENT;
+    }
+    return OK;
 }
 
 /** display list elements as "[ e1 ... eN ]" (O(N)).
@@ -117,6 +159,9 @@ status 	remFromList	(List*L, void*e){
  * @return OK otherwise
 */
 status 	displayList	(List* L){
+    if (!L->pr){
+        return ERRUNABLE;
+    }
     Node * temp = L->head;
     while(!temp->next){
         L->pr(temp->val);
@@ -154,6 +199,9 @@ int	lengthList	(List* L){
  * @return OK otherwise
  */
 status	addList	(List*L, void*e){
+    if (!L->comp){
+        return ERRUNABLE;
+    }
     Node * newElt = (Node *)malloc(sizeof(Node));
     if (!newElt){
         return ERRALLOC;
@@ -191,9 +239,7 @@ status	addList	(List*L, void*e){
  * @return (a pointer to) the predecessor of the search element otherwise
  */
 Node*	isInList	(List*L, void*e){
-
-    Node * temp = L->head;
-    if (!temp){
+    if (!L->comp){
         return 0;
     }
     Node * pr1 = L->head;
