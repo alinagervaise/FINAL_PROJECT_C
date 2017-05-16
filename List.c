@@ -72,7 +72,7 @@ status 	nthInList	(List* L, int n, void** e){
     while(temp || i < n){
        temp = temp->next;
     }
-    memcpy( temp->val, e, sizeof(L)/L->nelts);
+    *e = temp->val;
     return OK;
 }
 /** Insert element at a given position in the list (O(N)).
@@ -89,7 +89,8 @@ status 	addListAt	(List*L, int p, void* e){
     if (!newElt){
         return ERRALLOC;
     }
-    memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    //memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    e = newElt->val;
     newElt->next = 0;
     //insert the new node
     Node * temp = L->head;
@@ -105,6 +106,8 @@ status 	addListAt	(List*L, int p, void* e){
         if (count == p){
             newElt->next = temp;
             prev->next = newElt;
+            L->nelts++;
+            break;
         }
     }
     return OK;
@@ -135,6 +138,7 @@ status 	remFromListAt	(List* L, int p,void** e){
         if ((count == p) || (L->comp(temp->val, e)==0)){
             isFound =1;
             prev->next = temp->next;
+            L->nelts--;
             free(temp);
         }
     }
@@ -166,6 +170,7 @@ status 	remFromList	(List*L, void*e){
         if (L->comp(temp->val, e)==0){
             isFound = 1;
             prev->next = temp->next;
+            L->nelts--;
             free(temp);
         }
     }
@@ -186,8 +191,12 @@ status 	displayList	(List* L){
         return ERRUNABLE;
     }
     Node * temp = L->head;
-    while(!temp->next){
+    while(temp){
         L->pr(temp->val);
+        temp = temp->next;
+        if (temp){
+            printf("  --  ");
+        }
     }
     return OK;
 }
@@ -203,6 +212,7 @@ void	forEach		(List* L, void(*f)(void*)){
     Node * temp = L->head;
     while(temp){
         f(temp->val);
+        temp = temp->next;
     }
 }
 
@@ -211,13 +221,7 @@ void	forEach		(List* L, void(*f)(void*)){
  * @return the number of elements in given list
  */
 int	lengthList	(List* L){
-    int size;
-    Node * temp = L->head;
-    while(temp){
-        temp = temp->next;
-        size++;
-    }
-    return  size;
+    return  L->nelts;
 }
 
 /** add given element to given list according to compFun function (O(N)).
@@ -235,28 +239,39 @@ status	addList	(List*L, void*e){
     if (!newElt){
         return ERRALLOC;
     }
-    memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    //memcpy(newElt->val, e, sizeof(L)/L->nelts);
+    newElt->val = e;
     newElt->next = 0;
+
     Node * pr1 = L->head;
-    Node * prev;
-    if (!L->head){
-        L->head->next = newElt;
-    }
-    else {
-        while(pr1){
-            prev = pr1;
-            pr1 = pr1->next;
-
-            if (L->comp(newElt->val, pr1->val) < 0){
-                //insert before temp
-                newElt->next = pr1;
-                prev->next = newElt;
-
+    Node * prev ;
+    while(pr1){
+        prev = pr1;
+        pr1 = pr1->next;
+        if (!pr1){
+            if( L->comp(newElt->val, prev->val)==1){
+                // adding   the tail
+                pr1 = newElt;
+                prev->next = pr1;
+                L->nelts++;
                 break;
             }
         }
+        else  {
+           if ( L->comp(newElt->val, pr1->val) <=0){
+               //insert between node
+               newElt->next = pr1;
+               prev->next = newElt;
+               L->nelts ++;
+               break;
+           }
+        }
     }
-    L->nelts ++;;
+    if (!L->head ){
+        pr1 = newElt;
+        L->head = pr1;
+        L->nelts ++;
+    }
     return OK;
 }
 
@@ -268,25 +283,21 @@ status	addList	(List*L, void*e){
  * @return (a pointer to) the predecessor of the search element otherwise
  */
 Node*	isInList	(List*L, void*e){
-    if (!L->comp){
+    if (!L->comp || !L->head){
         return 0;
     }
     Node * pr1 = L->head;
-    Node * prev;
+    Node * prev = L->head;
     int isHead = 0;
     while(pr1){
             prev = pr1;
             pr1 = pr1->next;
-            isHead ++;
-
-            if (L->comp(e, pr1->val) == 0){
-                if (isHead==1){
-                    return pr1;
-                }
-                else{
-                    return prev;
-                }
-            }
+        if (L->comp(e, prev->val) == 0 && (prev== L->head)){
+            return (Node*)1;
+        }
+        else if (L->comp(e, prev->val) == 0 ){
+            return prev;
+        }
     }
     return 0;
 }

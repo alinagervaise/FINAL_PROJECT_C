@@ -59,35 +59,32 @@ int main() {
   List* l = newList(compString,prString);
   if (!l) return 1;
 
-  /* populating list */
-  for (i=0; i < sizeof(tab)/sizeof(char*); i++)
-    addList(l,tab[i]);
+    /* populating list */
+    for (i=0; i < sizeof(tab)/sizeof(char*); i++)
+        addList(l,tab[i]);
+    /* display list - should be sorted */
+    displayList(l);
+    putchar('\n');
 
-  /* display list - should be sorted */
-  displayList(l);
-  putchar('\n');
+    /*  test contain predicate */
+    if (isInList(l,"mourir"))
+        puts("mourir is in list");
+    else
+        puts("mourir is not in list");
+    if (isInList(l,"vivre"))
+        puts("vivre is in list");
+    else
+        puts("vivre is not in list");
+    /* test length (beware: sizeof is long int!) */
+    printf("length : %d (expected %ld)\n", lengthList(l),
+           sizeof(tab)/sizeof(char*));
 
-  /*  test contain predicate */
-  if (isInList(l,"mourir"))
-    puts("mourir is in list");
-  else
-    puts("mourir is not in list");
-  if (isInList(l,"vivre"))
-    puts("vivre is in list");
-  else
-    puts("vivre is not in list");
+    /* test forEach */
+    puts("forEach:");
+    forEach(l,prString2);
 
-  /* test length (beware: sizeof is long int!) */
-  printf("length : %d (expected %ld)\n", lengthList(l),
-	 sizeof(tab)/sizeof(char*));
-
-  /* test forEach */
-  puts("forEach:");
-  forEach(l,prString2);
-  
-  /* final cleanup */
-  delList(l);
-
-  return 0;
+    /* final cleanup */
+    delList(l);
+    return 0;
 }
 /*************************************************************/
