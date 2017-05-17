@@ -89,26 +89,46 @@ status 	addListAt	(List*L, int p, void* e){
     if (!newElt){
         return ERRALLOC;
     }
-    //memcpy(newElt->val, e, sizeof(L)/L->nelts);
-    e = newElt->val;
+    newElt->val = e;
     newElt->next = 0;
     //insert the new node
-    Node * temp = L->head;
+    Node * pNext = L->head;
     Node *prev;
-    int count = 0;
-    while(temp){
-        prev = temp;
-        temp = temp->next;
+    int count = -1;
+    while(pNext){
+        prev = pNext;
+        pNext = pNext->next;
         count ++;
         if (count > L->nelts){
             return  ERRINDEX;
         }
-        if (count == p){
-            newElt->next = temp;
-            prev->next = newElt;
-            L->nelts++;
-            break;
+        else if (count == p){
+            if (p==L->nelts-1){
+                // adding   the tail
+                pNext = newElt;
+                prev->next = pNext;
+                L->nelts++;
+                return OK;
+            }
+            else if (p==0){
+                newElt->next = prev;
+                L->head = newElt;
+                L->nelts++;
+                return OK;
+            }
+            else{
+                newElt->next = pNext;
+                prev->next = newElt;
+                L->nelts++;
+            }
         }
+    }
+
+    // add to the head of the empty list
+    if (!L->head && p == 0){
+        L->head = newElt;
+        L->nelts++;
+        return OK;
     }
     return OK;
 }
@@ -126,7 +146,7 @@ status 	remFromListAt	(List* L, int p,void** e){
     }
     Node * temp = L->head;
     Node *prev;
-    int count = 0;
+    int count = -1;
     int isFound = 0;
     while(temp){
         prev = temp;
@@ -137,9 +157,21 @@ status 	remFromListAt	(List* L, int p,void** e){
         }
         if ((count == p) || (L->comp(temp->val, e)==0)){
             isFound =1;
-            prev->next = temp->next;
+            if (p==L->nelts-1){
+                // removing   the tail
+                free(temp);
+            }
+            else if (p==0){
+                // removing the head
+                L->head = temp;
+                free(prev);
+            }
+            else{
+                prev->next = temp->next;
+                free(temp);
+            }
             L->nelts--;
-            free(temp);
+            return OK;
         }
     }
     if (!isFound){
@@ -164,14 +196,30 @@ status 	remFromList	(List*L, void*e){
     Node * temp = L->head;
     Node *prev;
     int isFound = 0;
+    int count = -1;
     while(temp){
         prev = temp;
         temp = temp->next;
-        if (L->comp(temp->val, e)==0){
-            isFound = 1;
-            prev->next = temp->next;
+        if (count > L->nelts){
+            return  ERRINDEX;
+        }
+        if (L->comp(prev->val, e)==0){
+            isFound =1;
+            if (count==L->nelts-1){
+                // removing   the tail
+                free(temp);
+            }
+            else if (count==0){
+                // removing the head
+                L->head = temp;
+                free(prev);
+            }
+            else{
+                prev->next = temp->next;
+                free(temp);
+            }
             L->nelts--;
-            free(temp);
+            return OK;
         }
     }
     if (!isFound){
